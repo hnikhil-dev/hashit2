@@ -165,9 +165,40 @@ function App() {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    resetFeedback();
+
+    if (!supabase) {
+      setError('Supabase is not configured. Add your env keys first.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+
+      if (googleError) {
+        throw googleError;
+      }
+    } catch (googleError) {
+      setError(
+        googleError.message ||
+          'Google sign-in could not start. Check your Supabase Google provider settings.'
+      );
+      setLoading(false);
+    }
+  };
+
   const currentUser = session?.user;
   const username =
     currentUser?.user_metadata?.username ||
+    currentUser?.user_metadata?.full_name ||
     currentUser?.email?.split('@')[0] ||
     'User';
 
@@ -203,9 +234,11 @@ function App() {
             <p className="panel-copy">
               You are signed in as <strong>{currentUser.email}</strong>.
             </p>
+            {error ? <p className="feedback error">{error}</p> : null}
+            {message ? <p className="feedback success">{message}</p> : null}
             <button
               type="button"
-              className="primary-button"
+              className="secondary-button"
               onClick={handleSignOut}
               disabled={loading}
             >
@@ -241,8 +274,21 @@ function App() {
             <p className="panel-copy">
               {mode === 'login'
                 ? 'Sign in with your Gmail address and password.'
-                : 'Create an account with a username, Gmail address, and password.'}
+                : 'Create an account with a username, Gmail address, password, or use Google.'}
             </p>
+
+            <button
+              type="button"
+              className="google-button"
+              onClick={handleGoogleAuth}
+              disabled={loading}
+            >
+              {loading ? 'Opening Google...' : 'Continue with Google'}
+            </button>
+
+            <div className="divider">
+              <span>or continue with email</span>
+            </div>
 
             <form className="auth-form" onSubmit={handleSubmit}>
               {mode === 'register' ? (
