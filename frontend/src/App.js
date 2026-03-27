@@ -32,6 +32,125 @@ const FloatingSymbols = () => {
   );
 };
 
+// New Dashboard and About pages from upstream
+function DashboardPage({ username, onNavigate, onSignOut, loading }) {
+  return (
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <h2>Vectra</h2>
+        </div>
+        <div className="navbar-menu">
+          <button className="nav-button active" onClick={() => onNavigate('dashboard')}>
+            Dashboard
+          </button>
+          <button className="nav-button" onClick={() => onNavigate('about')}>
+            About
+          </button>
+          <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
+            {loading ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
+      </nav>
+
+      <main className="home-main">
+        <div className="welcome-section">
+          <h1>Welcome back, {username}!</h1>
+          <p className="welcome-subtitle">Choose your action to continue with financial simulation:</p>
+        </div>
+
+        <div className="dashboard-grid">
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Financial Game</h3>
+              <p>Start your financial simulation journey.</p>
+            </div>
+            <button className="primary-button" onClick={() => onNavigate('home')}>
+              Enter Game Room
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Financial Quiz</h3>
+              <p>Test your financial knowledge and skills.</p>
+            </div>
+            <button className="primary-button" onClick={() => onNavigate('quiz')}>
+              Take Quiz
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Learn More</h3>
+              <p>Discover how Vectra works and game mechanics.</p>
+            </div>
+            <button className="primary-button" onClick={() => onNavigate('about')}>
+              About Game
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function AboutPage({ username, onBack, onSignOut, loading }) {
+  return (
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <h2>Vectra</h2>
+        </div>
+        <div className="navbar-menu">
+          <button className="nav-button" onClick={onBack}>Dashboard</button>
+          <button className="nav-button active">About</button>
+          <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
+            {loading ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
+      </nav>
+
+      <main className="home-main">
+        <div className="welcome-section">
+          <h1>About Vectra</h1>
+          <p className="welcome-subtitle">Financial Life Simulation Game</p>
+        </div>
+
+        <div className="dashboard-grid">
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Game Overview</h3>
+            </div>
+            <p>Vectra simulates real-world financial decision-making through competitive multiplayer gameplay. Make strategic investments, manage risks, and build wealth over multiple years.</p>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>How to Play</h3>
+            </div>
+            <p>Each round represents one year. Allocate your income between different investments, handle random events, and compete with other players to maximize your net worth.</p>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Investment Options</h3>
+            </div>
+            <p>Choose from Savings (4% fixed), Mutual Funds (8-12%), Stocks (±20%), Gold, Real Estate, and Crypto (±40%). Each option unlocks as you progress through years.</p>
+          </div>
+        </div>
+
+        <div className="dashboard-card" style={{marginTop: '32px'}}>
+          <div className="card-header">
+            <h3>Team Vectra</h3>
+          </div>
+          <p>Built for hackathon competition, combining financial education with engaging gameplay. Experience realistic market scenarios, risk management, and strategic planning in a safe, simulated environment.</p>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 function App() {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState(initialForm);
@@ -39,12 +158,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [route, setRoute] = useState('auth'); // Add routing state
   const [roomForm, setRoomForm] = useState({
     createName: '',
     joinName: '',
   });
 
   const isConfigured = useMemo(() => Boolean(supabase), []);
+
+  const navigate = (path) => {
+    setRoute(path);
+    resetFeedback();
+  };
 
   useEffect(() => {
     if (!supabase) {
@@ -257,6 +382,63 @@ function App() {
     currentUser?.user_metadata?.full_name ||
     currentUser?.email?.split('@')[0] ||
     'User';
+
+  // Add routing logic based on authentication and route state
+  useEffect(() => {
+    if (currentUser) {
+      if (route === 'auth') {
+        navigate('dashboard');
+      }
+    } else {
+      if (route !== 'auth') {
+        navigate('auth');
+      }
+    }
+  }, [currentUser]);
+
+  // Handle different routes for authenticated users
+  if (currentUser && route === 'dashboard') {
+    return (
+      <DashboardPage
+        username={username}
+        onNavigate={(path) => {
+          if (path === 'quiz') {
+            setMessage('Quiz feature coming soon!');
+            return;
+          }
+          navigate(path);
+        }}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+    );
+  }
+
+  if (currentUser && route === 'about') {
+    return (
+      <AboutPage
+        username={username}
+        onBack={() => navigate('dashboard')}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+    );
+  }
+
+  if (currentUser && route === 'home') {
+    return (
+      <HomePage
+        currentUser={currentUser}
+        error={error}
+        message={message}
+        loading={loading}
+        onRoomChange={handleRoomChange}
+        onCreateRoom={handleCreateRoom}
+        onJoinRoom={handleJoinRoom}
+        onSignOut={handleSignOut}
+      />
+    );
+  }
 
   return (
     <>
