@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import './App.css';
+import HomePage from './HomePage';
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
@@ -16,13 +17,37 @@ const initialForm = {
 
 function App() {
   const [mode, setMode] = useState('login');
+  const [route, setRoute] = useState(
+    window.location.pathname === '/home' ? 'home' : 'auth'
+  );
   const [form, setForm] = useState(initialForm);
   const [session, setSession] = useState(null);
+  const [roomForm, setRoomForm] = useState({
+    createName: '',
+    joinName: '',
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const isConfigured = useMemo(() => Boolean(supabase), []);
+
+  const navigate = (nextRoute) => {
+    const nextPath = nextRoute === 'home' ? '/home' : '/';
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, '', nextPath);
+    }
+    setRoute(nextRoute);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setRoute(window.location.pathname === '/home' ? 'home' : 'auth');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     if (!supabase) {
@@ -60,6 +85,14 @@ function App() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleRoomChange = (event) => {
+    const { name, value } = event.target;
+    setRoomForm((current) => ({
       ...current,
       [name]: value,
     }));
@@ -195,12 +228,71 @@ function App() {
     }
   };
 
+  const handleCreateRoom = (event) => {
+    event.preventDefault();
+    resetFeedback();
+    const createName = roomForm.createName.trim();
+
+    if (!createName) {
+      setError('Please enter your name to create a room.');
+      return;
+    }
+
+    setMessage(`Room created by ${createName}.`);
+    setRoomForm((current) => ({
+      ...current,
+      createName: '',
+    }));
+  };
+
+  const handleJoinRoom = (event) => {
+    event.preventDefault();
+    resetFeedback();
+    const joinName = roomForm.joinName.trim();
+
+    if (!joinName) {
+      setError('Please enter your name to join a room.');
+      return;
+    }
+
+    setMessage(`${joinName} joined the room.`);
+    setRoomForm((current) => ({
+      ...current,
+      joinName: '',
+    }));
+  };
+
   const currentUser = session?.user;
   const username =
     currentUser?.user_metadata?.username ||
     currentUser?.user_metadata?.full_name ||
     currentUser?.email?.split('@')[0] ||
     'User';
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('home');
+    } else {
+      navigate('auth');
+    }
+  }, [currentUser]);
+
+  if (currentUser && route === 'home') {
+    return (
+      <HomePage
+        currentUser={currentUser}
+        username={username}
+        roomForm={roomForm}
+        error={error}
+        message={message}
+        loading={loading}
+        onRoomChange={handleRoomChange}
+        onCreateRoom={handleCreateRoom}
+        onJoinRoom={handleJoinRoom}
+        onSignOut={handleSignOut}
+      />
+    );
+  }
 
   return (
     <main className="app-shell">
@@ -226,24 +318,6 @@ function App() {
               Add `REACT_APP_SUPABASE_URL` and `REACT_APP_SUPABASE_ANON_KEY` to
               your `.env` file, then restart the frontend.
             </p>
-          </div>
-        ) : currentUser ? (
-          <div className="auth-card">
-            <p className="status-badge">Authenticated</p>
-            <h2>Welcome, {username}</h2>
-            <p className="panel-copy">
-              You are signed in as <strong>{currentUser.email}</strong>.
-            </p>
-            {error ? <p className="feedback error">{error}</p> : null}
-            {message ? <p className="feedback success">{message}</p> : null}
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={handleSignOut}
-              disabled={loading}
-            >
-              {loading ? 'Signing out...' : 'Sign out'}
-            </button>
           </div>
         ) : (
           <div className="auth-card">
