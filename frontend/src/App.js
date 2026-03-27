@@ -15,11 +15,109 @@ const initialForm = {
   password: '',
 };
 
+function DashboardPage({ username, onNavigate, onSignOut, loading }) {
+  return (
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <h2>HashIt</h2>
+        </div>
+        <div className="navbar-menu">
+          <button className="nav-button active" onClick={() => onNavigate('dashboard')}>
+            Home
+          </button>
+          <button className="nav-button" onClick={() => onNavigate('about')}>
+            About
+          </button>
+          <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
+            {loading ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
+      </nav>
+
+      <main className="home-main">
+        <div className="welcome-section">
+          <h1>Welcome back, {username}!</h1>
+          <p className="welcome-subtitle">Choose your action to continue:</p>
+        </div>
+
+        <div className="dashboard-grid">
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Game</h3>
+              <p>Open your existing game page.</p>
+            </div>
+            <button className="primary-button" onClick={() => onNavigate('home')}>
+              Open Game
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>Quiz</h3>
+              <p>Quiz feature for setting reminders and tracking progress.</p>
+            </div>
+            <button className="primary-button" onClick={() => onNavigate('quiz')}>
+              Open Quiz
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h3>AI</h3>
+              <p>AI-powered features coming soon.</p>
+            </div>
+            <button className="primary-button">
+              Open AI
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function AboutPage({ username, onBack, onSignOut, loading }) {
+  return (
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <h2>HashIt</h2>
+        </div>
+        <div className="navbar-menu">
+          <button className="nav-button" onClick={onBack}>Home</button>
+          <button className="nav-button active">About</button>
+          <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
+            {loading ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
+      </nav>
+
+      <main className="home-main">
+        <div className="welcome-section">
+          <h1>About HashIt</h1>
+          <p className="welcome-subtitle">This app combines game and quiz features in a polished dashboard.</p>
+        </div>
+        <div className="dashboard-card" style={{ maxWidth: '680px', margin: '0 auto' }}>
+          <div className="card-header">
+            <h3>App expectations</h3>
+            <p>Use Home for the game flow, and future Quiz section will include reminder behavior.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 function App() {
   const [mode, setMode] = useState('login');
-  const [route, setRoute] = useState(
-    window.location.pathname === '/home' ? 'home' : 'auth'
-  );
+  const [route, setRoute] = useState(() => {
+    const path = window.location.pathname;
+    if (path === '/home') return 'home';
+    if (path === '/dashboard') return 'dashboard';
+    if (path === '/about') return 'about';
+    return 'auth';
+  });
   const [form, setForm] = useState(initialForm);
   const [session, setSession] = useState(null);
   const [roomForm, setRoomForm] = useState({
@@ -33,7 +131,11 @@ function App() {
   const isConfigured = useMemo(() => Boolean(supabase), []);
 
   const navigate = (nextRoute) => {
-    const nextPath = nextRoute === 'home' ? '/home' : '/';
+    let nextPath = '/';
+    if (nextRoute === 'home') nextPath = '/home';
+    if (nextRoute === 'dashboard') nextPath = '/dashboard';
+    if (nextRoute === 'about') nextPath = '/about';
+
     if (window.location.pathname !== nextPath) {
       window.history.pushState({}, '', nextPath);
     }
@@ -191,6 +293,8 @@ function App() {
       }
 
       setMessage('You have been signed out.');
+      setSession(null);
+      navigate('auth');
     } catch (signOutError) {
       setError(signOutError.message || 'Unable to sign out right now.');
     } finally {
@@ -271,11 +375,39 @@ function App() {
 
   useEffect(() => {
     if (currentUser) {
-      navigate('home');
+      navigate('dashboard');
     } else {
       navigate('auth');
     }
   }, [currentUser]);
+
+  if (currentUser && route === 'dashboard') {
+    return (
+      <DashboardPage
+        username={username}
+        onNavigate={(path) => {
+          if (path === 'quiz') {
+            setMessage('Quiz feature coming soon!');
+            return;
+          }
+          navigate(path);
+        }}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+    );
+  }
+
+  if (currentUser && route === 'about') {
+    return (
+      <AboutPage
+        username={username}
+        onBack={() => navigate('dashboard')}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+    );
+  }
 
   if (currentUser && route === 'home') {
     return (
@@ -290,6 +422,8 @@ function App() {
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
         onSignOut={handleSignOut}
+        onHome={() => navigate('dashboard')}
+        onAbout={() => navigate('about')}
       />
     );
   }

@@ -11,6 +11,8 @@ function HomePage({
   onCreateRoom,
   onJoinRoom,
   onSignOut,
+  onHome,
+  onAbout,
 }) {
   return (
     <div className="home-container">
@@ -19,7 +21,12 @@ function HomePage({
           <h2>HashIt</h2>
         </div>
         <div className="navbar-menu">
-          <button className="nav-button active">Home</button>
+          <button className="nav-button" onClick={onHome}>
+            Home
+          </button>
+          <button className="nav-button" onClick={onAbout}>
+            About
+          </button>
           <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
             {loading ? 'Signing out...' : 'Sign Out'}
           </button>
