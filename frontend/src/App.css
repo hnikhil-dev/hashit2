@@ -8,6 +8,34 @@
     linear-gradient(135deg, #f5efe6 0%, #e8f0ff 48%, #f7fbff 100%);
 }
 
+.home-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 210, 140, 0.45), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(73, 161, 255, 0.28), transparent 28%),
+    linear-gradient(135deg, #f5efe6 0%, #e8f0ff 48%, #f7fbff 100%);
+}
+
+.home-panel {
+  width: min(100%, 640px);
+  padding: 32px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.home-panel h1 {
+  margin: 14px 0 10px;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
 .hero-panel,
 .auth-panel {
   padding: 48px 32px;
@@ -197,6 +225,25 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.room-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.room-card {
+  padding: 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  display: grid;
+  gap: 12px;
+}
+
+.room-card h3 {
+  margin: 0;
+  color: #0f172a;
 }
 
 .divider {
