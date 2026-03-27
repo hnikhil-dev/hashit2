@@ -355,11 +355,17 @@ function MarketsPage({ onBack, onSignOut, loading }) {
           <button
             className={`card-action-button${activeTab === 'learn' ? ' primary' : ''}`}
             onClick={() => setActiveTab('learn')}
-          >📚 Learn</button>
+          >
+            <span className="tab-icon learn-tab-icon"></span>
+            Learn
+          </button>
           <button
             className={`card-action-button${activeTab === 'charts' ? ' primary' : ''}`}
             onClick={() => setActiveTab('charts')}
-          >📈 Live Charts</button>
+          >
+            <span className="tab-icon chart-tab-icon"></span>
+            Live Charts
+          </button>
         </div>
 
         {activeTab === 'learn' && (

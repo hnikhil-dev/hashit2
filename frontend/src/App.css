@@ -1532,6 +1532,72 @@
   transform: translate(-50%, -50%);
 }
 
+/* Tab Icons for Markets Page */
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.learn-tab-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 16px;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 1px 1px 1px 1px;
+  transform: translate(-50%, -50%);
+}
+
+.learn-tab-icon::after {
+  content: '';
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  width: 8px;
+  height: 1px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+  box-shadow: 0 3px 0 currentColor, 0 6px 0 currentColor;
+}
+
+.chart-tab-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 12px;
+  background: transparent;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.chart-tab-icon::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 65%;
+  width: 6px;
+  height: 1px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 1px;
+  box-shadow: 
+    -3px 3px 0 currentColor,
+    -6px 6px 0 currentColor;
+}
+
 .action-card:hover .card-icon {
   opacity: 1;
   background: rgba(0, 255, 157, 0.15);
