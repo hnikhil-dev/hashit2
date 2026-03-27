@@ -149,6 +149,26 @@ function DashboardPage({ username, onNavigate, onSignOut, loading }) {
                 <span className="button-arrow">→</span>
               </button>
             </div>
+
+            <div className="action-card">
+              <div className="card-decoration"></div>
+              <div className="card-icon-wrapper">
+                <div className="card-icon chart-icon"></div>
+              </div>
+              <div className="card-content">
+                <h3>Financial Markets</h3>
+                <p>Learn how the Indian stock market works — Nifty, Sensex, bull/bear cycles — and view live charts for NSE & BSE indices.</p>
+                <div className="card-features">
+                  <span className="feature-tag">NSE / BSE</span>
+                  <span className="feature-tag">Live Charts</span>
+                  <span className="feature-tag">Learn</span>
+                </div>
+              </div>
+              <button className="card-action-button" onClick={() => onNavigate('markets')}>
+                Explore Markets
+                <span className="button-arrow">→</span>
+              </button>
+            </div>
           </div>
         </section>
 
@@ -178,6 +198,238 @@ function DashboardPage({ username, onNavigate, onSignOut, loading }) {
             </div>
           </div>
         </section>
+      </main>
+    </div>
+  );
+}
+
+const CHART_WIDGETS = [
+  { label: 'Nifty 50', symbol: 'NSE:NIFTY', color: '#00ff9d' },
+  { label: 'Sensex', symbol: 'BSE:SENSEX', color: '#00d0ff' },
+  { label: 'Bank Nifty', symbol: 'NSE:BANKNIFTY', color: '#a78bfa' },
+  { label: 'Nifty IT', symbol: 'NSE:NIFTYIT', color: '#fbbf24' },
+  { label: 'Nifty Pharma', symbol: 'NSE:CNXPHARMA', color: '#f472b6' },
+  { label: 'Nifty Midcap', symbol: 'NSE:NIFTY_MIDCAP_100', color: '#fb923c' },
+];
+
+const MARKET_TOPICS = [
+  {
+    title: 'The Stock Market — An Introduction',
+    tag: 'Module 1',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/07/M1-Ch1-title.jpg',
+    body: 'A stock market is where buyers and sellers trade shares of publicly listed companies. In India, the two primary exchanges are NSE (National Stock Exchange) and BSE (Bombay Stock Exchange). When you buy a share, you own a small piece of that company and participate in its profits and growth.',
+    points: [
+      'NSE & BSE are India\'s two main stock exchanges',
+      'SEBI regulates all market activity to protect investors',
+      'Shares represent fractional ownership of a company',
+      'Market hours: 9:15 AM – 3:30 PM IST, Mon–Fri',
+    ],
+    source: 'https://zerodha.com/varsity/module/introduction-to-stock-markets/',
+  },
+  {
+    title: 'Bull & Bear Markets',
+    tag: 'Module 1 · Ch 4',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/09/M1-Ch4-Chart.jpg',
+    body: 'A bull market is a sustained period of rising prices (20%+ gains) driven by strong economic growth and investor confidence. A bear market is the opposite — prices fall 20%+ from recent highs, often triggered by recessions or crises. Recognising the cycle helps you decide when to buy, hold, or exit.',
+    points: [
+      'Bull market: optimism, rising GDP, high employment',
+      'Bear market: pessimism, falling corporate earnings',
+      'Corrections (10% drop) are normal and healthy',
+      'Long-term investors use bear markets to accumulate quality stocks',
+    ],
+    source: 'https://zerodha.com/varsity/chapter/commonly-used-jargons/',
+  },
+  {
+    title: 'Sensex & Nifty 50 — Market Indices',
+    tag: 'Module 1 · Ch 5',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/09/M1-Ch5-Chart.jpg',
+    body: 'Sensex tracks the 30 largest companies on BSE. Nifty 50 tracks the 50 largest on NSE. Both are free-float market-cap weighted indices — bigger companies have more influence. They act as the pulse of the Indian economy and benchmark for all fund performance.',
+    points: [
+      'Nifty 50 base value: 1000 (Nov 3, 1995)',
+      'Sensex base value: 100 (1978–79)',
+      'Sector indices: Nifty Bank, Nifty IT, Nifty Pharma, etc.',
+      'Index funds & ETFs passively track these benchmarks',
+    ],
+    source: 'https://zerodha.com/varsity/chapter/the-stock-markets-index/',
+  },
+  {
+    title: 'Candlestick Charts — Reading Price Action',
+    tag: 'Module 2',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/10/M2-Ch3-Chart1.jpg',
+    body: 'A candlestick shows four prices for a period: Open, High, Low, Close. A green (bullish) candle means close > open; red (bearish) means close < open. The wicks show the high and low extremes. Patterns like Doji, Hammer, and Engulfing signal potential reversals.',
+    points: [
+      'Green candle = buyers in control (close > open)',
+      'Red candle = sellers in control (close < open)',
+      'Long upper wick = rejection of higher prices',
+      'Hammer pattern signals potential bullish reversal',
+    ],
+    source: 'https://zerodha.com/varsity/module/technical-analysis/',
+  },
+  {
+    title: 'Support, Resistance & Moving Averages',
+    tag: 'Module 2 · Ch 7',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/10/M2-Ch7-Chart1.jpg',
+    body: 'Support is a price level where buying interest prevents further decline. Resistance is where selling pressure caps upward movement. Moving averages (50-day, 200-day) smooth out price noise and identify trend direction. A Golden Cross (50 MA crossing above 200 MA) is a classic bullish signal.',
+    points: [
+      'Support = floor; Resistance = ceiling for price',
+      '50-day MA tracks medium-term trend',
+      '200-day MA tracks long-term trend',
+      'Golden Cross (50 > 200 MA) = bullish; Death Cross = bearish',
+    ],
+    source: 'https://zerodha.com/varsity/chapter/support-resistance/',
+  },
+  {
+    title: 'Fundamental Analysis — Reading Financials',
+    tag: 'Module 3',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2014/11/M3-Ch1-title.jpg',
+    body: 'Fundamental analysis evaluates a company\'s intrinsic value by studying its financials — revenue, profit, debt, and growth. Key ratios like P/E, ROE, and Debt-to-Equity help compare companies. A stock trading below intrinsic value is considered undervalued and a potential buy.',
+    points: [
+      'P/E Ratio: how much you pay per ₹1 of earnings',
+      'ROE > 15% indicates efficient use of shareholder capital',
+      'Debt/Equity < 1 is generally considered safe',
+      'EPS growth over 3–5 years signals a strong business',
+    ],
+    source: 'https://zerodha.com/varsity/module/fundamental-analysis/',
+  },
+  {
+    title: 'Risk, Diversification & Asset Allocation',
+    tag: 'Module 9',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2017/09/M9-C1-title.jpg',
+    body: 'Risk is the possibility of losing money. Diversification — spreading investments across asset classes (equity, debt, gold, real estate) and sectors — reduces unsystematic risk. Asset allocation is the single biggest driver of long-term portfolio returns.',
+    points: [
+      'Unsystematic risk (company-specific) can be diversified away',
+      'Systematic risk (market-wide) cannot be eliminated',
+      'Rule of thumb: 100 minus your age = % in equities',
+      'Rebalance portfolio annually to maintain target allocation',
+    ],
+    source: 'https://zerodha.com/varsity/module/personal-finance-mutual-funds/',
+  },
+  {
+    title: 'Mutual Funds & SIP — Investing Made Simple',
+    tag: 'Module 9 · Ch 3',
+    img: 'https://zerodha.com/varsity/wp-content/uploads/2017/09/M9-C3-title.jpg',
+    body: 'A mutual fund pools money from many investors into a diversified portfolio managed by a professional. A SIP (Systematic Investment Plan) lets you invest a fixed amount monthly, averaging your cost over time. Index funds are low-cost funds that simply track Nifty or Sensex.',
+    points: [
+      'Equity mutual funds: higher risk, higher long-term returns',
+      'Debt funds: lower risk, stable returns (better than FD post-tax)',
+      'SIP removes the need to time the market',
+      'Expense ratio < 0.5% is ideal for index funds',
+    ],
+    source: 'https://zerodha.com/varsity/chapter/mutual-fund-basics/',
+  },
+];
+
+const CHART_LINKS = [
+  { label: 'Nifty 50 Live Chart', url: 'https://www.tradingview.com/chart/?symbol=NSE%3ANIFTY' },
+  { label: 'Sensex Live Chart', url: 'https://www.tradingview.com/chart/?symbol=BSE%3ASENSEX' },
+  { label: 'Nifty Bank Live Chart', url: 'https://www.tradingview.com/chart/?symbol=NSE%3ABANKNIFTY' },
+  { label: 'Nifty IT Live Chart', url: 'https://www.tradingview.com/chart/?symbol=NSE%3ANIFTYIT' },
+  { label: 'NSE Market Overview', url: 'https://www.nseindia.com/market-data/live-equity-market' },
+  { label: 'BSE Market Overview', url: 'https://www.bseindia.com/markets/equity/EQReports/MarketWatch.aspx' },
+];
+
+function MarketsPage({ onBack, onSignOut, loading }) {
+  const [activeTab, setActiveTab] = React.useState('learn');
+  return (
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-brand"><h2>Vectra</h2></div>
+        <div className="navbar-menu">
+          <button className="nav-button" onClick={onBack}>Dashboard</button>
+          <button className="nav-button active">Markets</button>
+          <button className="nav-button signout" onClick={onSignOut} disabled={loading}>
+            {loading ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
+      </nav>
+      <main className="about-main">
+        <section className="about-hero">
+          <div className="about-content">
+            <div className="about-badge">Indian Stock Market</div>
+            <h1 className="about-title">Financial Markets<span className="title-accent"> Knowledge Hub</span></h1>
+            <p className="about-subtitle">Learn how stock markets work and track live Indian market charts.</p>
+          </div>
+        </section>
+
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
+          <button
+            className={`card-action-button${activeTab === 'learn' ? ' primary' : ''}`}
+            onClick={() => setActiveTab('learn')}
+          >📚 Learn</button>
+          <button
+            className={`card-action-button${activeTab === 'charts' ? ' primary' : ''}`}
+            onClick={() => setActiveTab('charts')}
+          >📈 Live Charts</button>
+        </div>
+
+        {activeTab === 'learn' && (
+          <section className="features-section">
+            <div style={{ display: 'grid', gap: '2rem', maxWidth: 900, margin: '0 auto' }}>
+              {MARKET_TOPICS.map((topic, i) => (
+                <div key={i} style={{
+                  background: 'rgba(15,20,32,0.85)',
+                  border: '1px solid rgba(0,255,157,0.15)',
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  backdropFilter: 'blur(20px)',
+                }}>
+                  <img
+                    src={topic.img}
+                    alt={topic.title}
+                    onError={e => { e.target.style.display = 'none'; }}
+                    style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }}
+                  />
+                  <div style={{ padding: '24px 28px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <span style={{
+                        padding: '3px 10px', borderRadius: 20,
+                        background: 'rgba(0,255,157,0.1)', border: '1px solid rgba(0,255,157,0.3)',
+                        color: '#00ff9d', fontSize: '0.75rem', fontWeight: 600,
+                      }}>{topic.tag}</span>
+                      <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem' }}>Zerodha Varsity</span>
+                    </div>
+                    <h3 style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 700, margin: '0 0 10px' }}>{topic.title}</h3>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, margin: '0 0 16px', fontSize: '0.95rem' }}>{topic.body}</p>
+                    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {topic.points.map((pt, j) => (
+                        <li key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem' }}>
+                          <span style={{ color: '#00ff9d', marginTop: 2, flexShrink: 0 }}>&#10003;</span>
+                          {pt}
+                        </li>
+                      ))}
+                    </ul>
+                    <a href={topic.source} target="_blank" rel="noopener noreferrer" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 18,
+                      color: '#00d0ff', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none',
+                    }}>Read on Varsity →</a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'charts' && (
+          <section className="features-section">
+            <h2 className="section-title">Live Indian Market Charts</h2>
+            <p style={{ color: 'var(--text-muted, #aaa)', textAlign: 'center', marginBottom: '1.5rem' }}>
+              Click any chart to open it live in a new tab via TradingView / NSE / BSE.
+            </p>
+            <div className="actions-grid">
+              {CHART_LINKS.map((link, i) => (
+                <div className="action-card" key={i}>
+                  <div className="card-content">
+                    <h3>{link.label}</h3>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted, #aaa)' }}>{link.url.replace('https://', '')}</p>
+                  </div>
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="card-action-button primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    View Chart <span className="button-arrow">→</span>
+                  </a>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
@@ -600,6 +852,16 @@ function App() {
           }
           navigate(path);
         }}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+    );
+  }
+
+  if (currentUser && route === 'markets') {
+    return (
+      <MarketsPage
+        onBack={() => navigate('dashboard')}
         onSignOut={handleSignOut}
         loading={loading}
       />
